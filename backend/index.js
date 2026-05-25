@@ -2,6 +2,7 @@ import express from "express"
 import dotenv from "dotenv"
 
 import authRoutes from "./routes/auth.routes.js"
+import passwordsRoutes from "./routes/passwords.routes.js"
 import mongoose from "mongoose";
 
 const app = express()
@@ -12,7 +13,8 @@ dotenv.config() // to read env variables from .env file
 
 app.get("/health", (req, res) => { res.send("API is working") }) // health check route
 
-app.use("/api/auth", authRoutes)
+app.use("/api/auth", authRoutes) // routes for user registration and login
+app.use("/api/passwords", passwordsRoutes)
 
 app.listen(process.env.PORT)
 
