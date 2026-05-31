@@ -18,27 +18,11 @@ let handlePasswordDecrypt = (pass) => {
 }
 
 /**
- * This function gets all passwords for logged in user and decrypts them
- */
-let handleGetAllPasswords = async (req, res) => {
-    try {
-        let passwords = await user.find({ _id: req.user._id }).sort({ createdAt: -1 }) // find and sort newest first
-
-        // decrpyt the encrypted passwords before sending the response
-
-
-    }
-    catch (err) {
-
-    }
-}
-
-/**
  * This function create a new password entry by encrypting it
  */
 let handleCreatePassword = async (req, res) => {
     try {
-        let { site, username = "", password, category = "other" } = req.body
+        let { site, category = "other", username = "", password } = req.body
 
         // check if site and password is sent in payload
         if (!site || !password) {
@@ -49,17 +33,31 @@ let handleCreatePassword = async (req, res) => {
             return
         }
 
-
+        // create a entry for new password 
         let newEntry = await user.create({
-            user: req.user._id, // user is added to req in authMiddleware
+            user: req.user._id, // user is added to req in authMiddleware 
             site,
-            category,
             username,
-            encryptedPassword: handlePasswordEncrypt(password)
+            encryptedPassword: handlePasswordEncrypt(password),
+            category,
+        })
+
+        // if new entry is made, then send the success response
+        res.status(201).json({
+            Status: "success",
+            _id: newEntry._id, // unique id for new password, not user
+            Site: newEntry.site,
+            Username: newEntry.username,
+            Password: handlePasswordDecrypt(newEntry.encryptedPassword), // todo: can return "", as the UI will still have entered password in memory and can display instantly
+            category: newEntry.category,
+            CreatedAt: newEntry.createdAt
         })
     }
     catch (err) {
-
+        res.status(500).json({
+            Status: "failed",
+            Message: err.message
+        })
     }
 }
 
@@ -82,6 +80,35 @@ let handleUpdatePassword = async (req, res) => {
 
     }
 }
+
+/**
+ * This function gets all passwords for logged in user and decrypts them
+ */
+let handleGetAllPasswords = async (req, res) => {
+    try {
+        let passwordList = await user.find({ _id: req.user._id }).sort({ createdAt: -1 }) // find and sort newest first
+
+        // decrpyt the encrypted passwords before sending the response
+
+        passwordList = passwordList.map(ele => {
+            return {
+                _id: ele._id,
+
+                Password: handlePasswordDecrypt(ele.Password)
+            }
+        })
+
+        res.status(201).json({
+            Status: "success",
+            Data: passwordList
+        })
+
+    }
+    catch (err) {
+
+    }
+}
+
 
 
 
