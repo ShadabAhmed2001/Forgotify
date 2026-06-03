@@ -15,11 +15,11 @@ let protect = async (req, res, next) => {
         }
 
         // if header exists, then extract and verify the token
-        let jwtToken = authHeader.split(" ")[0]
+        let jwtToken = authHeader.split(" ")[1]
         let decodeJWT = jwt.verify(jwtToken, process.env.JWT_SECRET) // returns an object
 
         // attach the user to req object
-        req.user = user.findById(decodeJWT.id).select({ Password: -1 })
+        req.user = await user.findById(decodeJWT.id).select({ Password: -1 })
         if (!req.user) {
             res.status(401).json({
                 Status: "failed",
@@ -31,6 +31,7 @@ let protect = async (req, res, next) => {
         next() // calls the next controller based on the API call
     }
     catch (err) {
+        console.log("failed")
         res.status(500).json({ Status: "failed", Message: err.message })
     }
 }

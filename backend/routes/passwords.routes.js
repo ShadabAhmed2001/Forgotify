@@ -9,10 +9,9 @@ let router = express.Router()
 router.use(protect)
 
 router.get("/", handleGetAllPasswords) // get all passwords
-router.post("/", handleCreatePassword) // create a new password
-router.delete("/:id", handleDeletePassword) // delete a password
-router.put("/:id", handleUpdatePassword) // update a password
-
+router.post("/create", handleCreatePassword) // create a new password
+router.delete("/delete/:id", handleDeletePassword) // delete a password
+router.put("/update/:id", handleUpdatePassword) // update a password
 
 
 export default router 

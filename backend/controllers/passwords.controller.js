@@ -1,20 +1,20 @@
 import CrytpoJS from "crypto-js"
-import user from "../models/user.model.js";
+import passwords from "../models/passwords.model.js";
 
-let crypto_secret = process.env.CRYPTO_SECRET
+// let crypto_secret = process.env.CRYPTO_SECRET
 
 /**
  * This function returns the encrypted password
  */
 let handlePasswordEncrypt = (pass) => {
-    return CrytpoJS.AES.encrypt(pass, crypto_secret).toString()
+    return CrytpoJS.AES.encrypt(pass, process.env.CRYPTO_SECRET).toString()
 }
 
 /**
  * This function returns the decrypted password
  */
 let handlePasswordDecrypt = (pass) => {
-    return CrytpoJS.AES.decrypt(pass, crypto_secret).toString(CrytpoJS.enc.Utf8)
+    return CrytpoJS.AES.decrypt(pass, process.env.CRYPTO_SECRET).toString(CrytpoJS.enc.Utf8)
 }
 
 /**
@@ -34,7 +34,7 @@ let handleCreatePassword = async (req, res) => {
         }
 
         // create a entry for new password 
-        let newEntry = await user.create({
+        let newEntry = await passwords.create({
             user: req.user._id, // user is added to req in authMiddleware 
             site,
             username,
@@ -105,7 +105,10 @@ let handleGetAllPasswords = async (req, res) => {
 
     }
     catch (err) {
-
+        res.status(500).json({
+            Status: "failed",
+            Message: err.message
+        })
     }
 }
 

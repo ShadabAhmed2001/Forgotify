@@ -29,6 +29,6 @@ let passwordSchema = new mongoose.Schema({
     }
 })
 
-let passwords = mongoose.Model("Passwords", passwordSchema)
+let passwords = mongoose.model("Passwords", passwordSchema)
 
 export default passwords
