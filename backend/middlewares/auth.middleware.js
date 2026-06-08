@@ -32,7 +32,7 @@ let protect = async (req, res, next) => {
     }
     catch (err) {
         console.log("failed")
-        res.status(500).json({ Status: "failed", Message: err.message })
+        res.status(401).json({ Status: "failed", Message: "Token invalid or expired" })
     }
 }
 

@@ -27,7 +27,10 @@ let passwordSchema = new mongoose.Schema({
         enum: ["Social", "Work", "Entertainment", "Others"],
         default: "Others"
     }
-})
+},
+    { timestamps: true }
+
+)
 
 let passwords = mongoose.model("Passwords", passwordSchema)
 

@@ -86,15 +86,26 @@ let handleUpdatePassword = async (req, res) => {
  */
 let handleGetAllPasswords = async (req, res) => {
     try {
-        let passwordList = await user.find({ _id: req.user._id }).sort({ createdAt: -1 }) // find and sort newest first
+        let passwordList = await passwords.find({ user: req.user._id }).sort({ createdAt: -1 }) // find and sort newest first
+
+
+        if (passwordList.length == 0) {
+            res.status(201).json({
+                Status: "success",
+                Data: []
+            })
+            return
+        }
 
         // decrpyt the encrypted passwords before sending the response
-
         passwordList = passwordList.map(ele => {
             return {
                 _id: ele._id,
-
-                Password: handlePasswordDecrypt(ele.Password)
+                Site: ele.site,
+                Username: ele.username,
+                Password: handlePasswordDecrypt(ele.encryptedPassword),
+                Category: ele.category,
+                CreatedAT: ele.createdAt
             }
         })
 
