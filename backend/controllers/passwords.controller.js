@@ -1,5 +1,6 @@
 import CrytpoJS from "crypto-js"
 import passwords from "../models/passwords.model.js";
+import checkForExisitingPasswordAndOwnership from "../utils/helpers.js";
 
 // let crypto_secret = process.env.CRYPTO_SECRET
 
@@ -61,19 +62,47 @@ let handleCreatePassword = async (req, res) => {
     }
 }
 
-
+/**
+ * This function handles deleting of password
+ */
 let handleDeletePassword = async (req, res) => {
     try {
 
+        let result = await checkForExisitingPasswordAndOwnership(req, res)
+
+        if (!result) {
+            return
+        }
+
+        // await result.findByIdAndDelete(req.params.id)
+        await result.deleteOne()
+
+        res.json({
+            Status: "success",
+            Message: "Password deleted successfully"
+        })
     }
     catch (err) {
-
+        res.status(500).json({
+            Status: "failed",
+            Message: err.message
+        })
     }
 }
 
-
+/**
+ * This function handles password updation
+ */
 let handleUpdatePassword = async (req, res) => {
     try {
+        let result = await checkForExisitingPasswordAndOwnership(req, res)
+
+        if (!result) {
+            return
+        }
+
+
+
 
     }
     catch (err) {
@@ -122,6 +151,7 @@ let handleGetAllPasswords = async (req, res) => {
         })
     }
 }
+
 
 
 
