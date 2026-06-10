@@ -1,22 +1,7 @@
-import CrytpoJS from "crypto-js"
 import passwords from "../models/passwords.model.js";
-import checkForExisitingPasswordAndOwnership from "../utils/helpers.js";
+import { checkForExisitingPasswordAndOwnership, handlePasswordDecrypt, handlePasswordEncrypt } from "../utils/helpers.js";
 
 // let crypto_secret = process.env.CRYPTO_SECRET
-
-/**
- * This function returns the encrypted password
- */
-let handlePasswordEncrypt = (pass) => {
-    return CrytpoJS.AES.encrypt(pass, process.env.CRYPTO_SECRET).toString()
-}
-
-/**
- * This function returns the decrypted password
- */
-let handlePasswordDecrypt = (pass) => {
-    return CrytpoJS.AES.decrypt(pass, process.env.CRYPTO_SECRET).toString(CrytpoJS.enc.Utf8)
-}
 
 /**
  * This function create a new password entry by encrypting it
@@ -70,9 +55,8 @@ let handleDeletePassword = async (req, res) => {
 
         let result = await checkForExisitingPasswordAndOwnership(req, res)
 
-        if (!result) {
-            return
-        }
+        if (!result) return
+
 
         // await result.findByIdAndDelete(req.params.id)
         await result.deleteOne()
@@ -97,18 +81,36 @@ let handleUpdatePassword = async (req, res) => {
     try {
         let result = await checkForExisitingPasswordAndOwnership(req, res)
 
-        if (!result) {
-            return
+        if (!result) return
+
+        let { site, username, password, category } = req.body
+
+        result.site = site || result.site
+        result.username = username || result.username
+        result.category = category || result.category
+        if (password) {
+            result.encryptedPassword = handlePasswordEncrypt(password)
         }
 
+        await result.save()
 
-
-
+        res.status(200).json({
+            Status: "success",
+            _id: result._id,
+            Site: result.site,
+            Username: result.username,
+            Password: password || handlePasswordDecrypt(password),
+            Category: result.category
+        })
     }
     catch (err) {
-
+        res.status(500).json({
+            Status: "failed",
+            Message: err.message
+        })
     }
 }
+
 
 /**
  * This function gets all passwords for logged in user and decrypts them
@@ -151,8 +153,6 @@ let handleGetAllPasswords = async (req, res) => {
         })
     }
 }
-
-
 
 
 

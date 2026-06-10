@@ -1,4 +1,23 @@
+import CrytpoJS from "crypto-js"
 import passwords from "../models/passwords.model.js"
+
+
+/**
+ * This function returns the encrypted password
+ */
+let handlePasswordEncrypt = (pass) => {
+    return CrytpoJS.AES.encrypt(pass, process.env.CRYPTO_SECRET).toString()
+}
+
+/**
+ * This function returns the decrypted password
+ */
+let handlePasswordDecrypt = (pass) => {
+    return CrytpoJS.AES.decrypt(pass, process.env.CRYPTO_SECRET).toString(CrytpoJS.enc.Utf8)
+}
+
+
+
 
 /**
  * This function checks if the password exists and its ownership
@@ -34,4 +53,4 @@ let checkForExisitingPasswordAndOwnership = async (req, res) => {
     }
 }
 
-export default checkForExisitingPasswordAndOwnership
+export { checkForExisitingPasswordAndOwnership, handlePasswordEncrypt, handlePasswordDecrypt }
